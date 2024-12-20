@@ -28,33 +28,32 @@ public class TaskManager {
         int lineCounter = 0;
         String[][] tasks = null;
 
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(path.toFile()));
+        try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile()))) {
             while (reader.readLine() != null) {
                 lineCounter++;
             }
+
             reader.close();
+            try (BufferedReader newReader = new BufferedReader(new FileReader(path.toFile()))) {
+                String[] firstLine = newReader.readLine().split(",");
+                tasks = new String[lineCounter][firstLine.length];
+                tasks[0] = firstLine;
 
-            reader = new BufferedReader(new FileReader(path.toFile()));
-            String[] firstLine = reader.readLine().split(",");
-            tasks = new String[lineCounter][firstLine.length];
-
-            tasks[0] = firstLine;
-            for (int i = 1; i < lineCounter; i++) {
-                String line = reader.readLine();
-                if (line != null) {
-                    tasks[i] = line.split(",");
+                for (int i = 1; i < lineCounter; i++) {
+                    String line = newReader.readLine();
+                    if (line != null) {
+                        tasks[i] = line.split(",");
+                    }
                 }
-
             }
-            reader.close();
         } catch (FileNotFoundException e) {
-            System.err.println("ERROR:File not found!");
+            System.err.println("ERROR: File not found!");
             e.printStackTrace(System.err);
         } catch (IOException e) {
-            System.err.println("ERROR:I/O error while reading file!");
+            System.err.println("ERROR: I/O error while reading file!");
             e.printStackTrace(System.err);
         }
+
         return tasks;
     }
 
@@ -71,6 +70,9 @@ public class TaskManager {
 //                break;
 //            case "list":
 //                listTasks();
+//                break;
+//            case "exit":
+//                exitTasks();
 //                break;
 //            default:
 //                System.out.println("Please select a correct option.");
@@ -95,20 +97,6 @@ public class TaskManager {
         tasks[tasks.length - 1][1] = deadline;
         tasks[tasks.length - 1][2] = String.valueOf(done);
 
-        final var path = Paths.get("src/main/resources/tasks.csv");
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile()));
-            for (int i = 0; i < tasks.length; i++) {
-                writer.write(tasks[i][0] + "," + tasks[i][1] + "," + tasks[i][2]);
-                writer.newLine();
-            }
-            writer.close();
-            System.out.println(ConsoleColors.GREEN + "Task added successfully!");
-
-        } catch (IOException e) {
-            System.err.println("ERROR:I/O error while writing file!");
-            e.printStackTrace();
-        }
         return tasks;
     }
 
@@ -131,7 +119,7 @@ public class TaskManager {
         while (scanner.hasNextInt()) {
             int taskIndex = scanner.nextInt();
             if (taskIndex <= 0 || taskIndex > tasks.length) {
-                System.err.println("ERROR:Invalid task index!");
+                System.err.println("ERROR: Invalid task index!");
                 System.out.println("Insert valid task index:");
             } else {
                 System.out.println("Array length before removal: " + tasks.length);
@@ -142,20 +130,22 @@ public class TaskManager {
             }
         }
 
+        return tasks;
+    }
+
+    public static void exitTasks(String[][] tasks) {
         final var path = Paths.get("src/main/resources/tasks.csv");
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile()));
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile()))) {
             for (int i = 0; i < tasks.length; i++) {
                 writer.write(tasks[i][0] + "," + tasks[i][1] + "," + tasks[i][2]);
                 writer.newLine();
             }
-            writer.close();
-
         } catch (IOException e) {
-            System.err.println("ERROR:I/O error while writing file!");
+            System.err.println("ERROR: I/O error while writing file!");
             e.printStackTrace();
-
         }
-        return tasks;
+        System.out.println(ConsoleColors.RED + "The program finished!" + ConsoleColors.RESET);
+        System.exit(0);
     }
 }
