@@ -1,5 +1,7 @@
 package pl.coderslab;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -9,7 +11,7 @@ public class TaskManager {
     public static void main(String[] args) {
         userOptions();
         String[][] tasks = readFile();
-        listTasks(tasks);
+        removeTask(tasks);
 
     }
 
@@ -94,7 +96,7 @@ public class TaskManager {
         tasks[tasks.length - 1][2] = String.valueOf(done);
 
         final var path = Paths.get("src/main/resources/tasks.csv");
-        try{
+        try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile()));
             for (int i = 0; i < tasks.length; i++) {
                 writer.write(tasks[i][0] + "," + tasks[i][1] + "," + tasks[i][2]);
@@ -115,10 +117,45 @@ public class TaskManager {
             System.out.println(ConsoleColors.RED + "No tasks found!" + ConsoleColors.RESET);
         }
         for (int i = 0; i < tasks.length; i++) {
-            System.out.println(ConsoleColors.BLUE_BOLD+ "Task #" + (i + 1) + ": " + ConsoleColors.RESET
-                    +  tasks[i][0] + ConsoleColors.BLUE + " Deadline: "+ ConsoleColors.RESET
-                    +  tasks[i][1] + ConsoleColors.BLUE +" Completion: " + ConsoleColors.RESET
-                    + tasks[i][2]+ "\n");
+            System.out.println(ConsoleColors.BLUE_BOLD + "Task #" + (i + 1) + ": " + ConsoleColors.RESET
+                    + tasks[i][0] + ConsoleColors.BLUE + " Deadline: " + ConsoleColors.RESET
+                    + tasks[i][1] + ConsoleColors.BLUE + " Completion: " + ConsoleColors.RESET
+                    + tasks[i][2] + "\n");
         }
+    }
+
+    public static String[][] removeTask(String[][] tasks) {
+        listTasks(tasks);
+        System.out.println(ConsoleColors.GREEN + "Insert the number of the task to remove: " + ConsoleColors.RESET);
+        final var scanner = new Scanner(System.in);
+        while (scanner.hasNextInt()) {
+            int taskIndex = scanner.nextInt();
+            if (taskIndex <= 0 || taskIndex > tasks.length) {
+                System.err.println("ERROR:Invalid task index!");
+                System.out.println("Insert valid task index:");
+            } else {
+                System.out.println("Array length before removal: " + tasks.length);
+                tasks = ArrayUtils.remove(tasks, taskIndex - 1);
+                System.out.println("Array length after removal: " + tasks.length);
+                System.out.println(ConsoleColors.GREEN + "Task removed successfully!");
+                break;
+            }
+        }
+
+        final var path = Paths.get("src/main/resources/tasks.csv");
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile()));
+            for (int i = 0; i < tasks.length; i++) {
+                writer.write(tasks[i][0] + "," + tasks[i][1] + "," + tasks[i][2]);
+                writer.newLine();
+            }
+            writer.close();
+
+        } catch (IOException e) {
+            System.err.println("ERROR:I/O error while writing file!");
+            e.printStackTrace();
+
+        }
+        return tasks;
     }
 }
