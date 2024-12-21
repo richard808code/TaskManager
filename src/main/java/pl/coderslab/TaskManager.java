@@ -29,6 +29,22 @@ public class TaskManager {
     }
 
     public static String[][] readFile() {
+        /*
+        CLEAN-CODE: jednodussi verze na mene radku
+        try {
+            final var lines = Files.readAllLines(TASK_FILE_PATH);
+
+            tasks = new String[lines.size()][];
+            for (int i = 0; i < lines.size(); i++) {
+                tasks[i] = lines.get(i).split(", ");
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to load tasks.csv");
+            e.printStackTrace(System.err);
+            System.exit(-1);
+        }
+         */
+
         final var path = Paths.get("src/main/resources/tasks.csv");
         int lineCounter = 0;
         String[][] tasks = null;
