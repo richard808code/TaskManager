@@ -54,8 +54,10 @@ public class TaskManager {
         } catch (FileNotFoundException e) {
             System.err.println("ERROR: File not found!");
             e.printStackTrace(System.err);
+            //BUG: zde bych program zastavil dalsi chod programu uz nema smysl System.exit(-1);
         } catch (IOException e) {
             System.err.println("ERROR: I/O error while reading file!");
+            //BUG: zde bych program zastavil dalsi chod programu uz nema smysl System.exit(-1);
             e.printStackTrace(System.err);
         }
 
