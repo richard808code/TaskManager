@@ -8,9 +8,14 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class TaskManager {
+
+    // CLEAN-CODE: promenne tasks a scanner bych dal jako globalni promenne pristupne ze vsech metod
+    //    private static String[][] tasks;
+    //    private static Scanner scanner;
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String[][] tasks = readFile();
+        String[][] tasks = readFile(); // CLEAN-CODE: prosim prejmenuj metodu readFile() na vice popisnou readTasks()
         handleUserInput(tasks, scanner);
     }
 
@@ -33,7 +38,7 @@ public class TaskManager {
                 lineCounter++;
             }
 
-            reader.close();
+            reader.close(); //BUG: reader uz je uzavreny v ramci try-with-resources bloku
             try (BufferedReader newReader = new BufferedReader(new FileReader(path.toFile()))) {
                 String[] firstLine = newReader.readLine().split(",");
                 tasks = new String[lineCounter][firstLine.length];
@@ -58,23 +63,24 @@ public class TaskManager {
     }
 
     public static void handleUserInput(String[][] tasks, Scanner scanner) {
+        // CLEAN-CODE: tuhle sekci bych celou predal do main metody aby bylo hned jasne co program dela
         String input;
         do {
-            userOptions();
-            input = scanner.nextLine();
+            userOptions(); // CLEAN-CODE: userOptions() -> displayUserOptions() hned je z nazvu metody jasne co metoda dela
+            input = scanner.nextLine(); // //IMPROVE: scanner.nextLine().toLowerCase(), umozni ti to zadat jak upper case tak lower case
 
             switch (input) {
                 case "add":
-                    tasks = addTask(tasks, scanner);
+                    tasks = addTask(tasks, scanner); //CLEAN-CODE: jak bude promenna tasks a scanner globalni tak zde se zjednodussi a bude jen metoda addTask()
                     break;
                 case "remove":
-                    tasks = removeTask(tasks, scanner);
+                    tasks = removeTask(tasks, scanner); //CLEAN-CODE: jak bude promenna tasks a scanner globalni tak zde se zjednodussi a bude jen metoda removeTask()
                     break;
                 case "list":
-                    listTasks(tasks);
+                    listTasks(tasks); //CLEAN-CODE: jak bude promenna tasks a scanner globalni tak zde se zjednodussi a bude jen metoda listTasks()
                     break;
                 case "exit":
-                    exitTasks(tasks, scanner);
+                    exitTasks(tasks, scanner); //CLEAN-CODE: jak bude promenna tasks a scanner globalni tak zde se zjednodussi a bude jen metoda exit(), asi lepsi pojmenovani nez exitTasks()
                     break;
                 default:
                     System.err.println("Please select a correct option!");
@@ -83,11 +89,11 @@ public class TaskManager {
     }
 
     public static String[][] addTask(String[][] tasks, Scanner scanner) {
-
         System.out.println(ConsoleColors.GREEN_BOLD_BRIGHT + "Please enter the description of the task including importance: " + ConsoleColors.RESET);
-        String task = scanner.nextLine();
+        String task = scanner.nextLine(); //CLEAN-CODE: promenne v metode defaultne nastavujeme na final, znamena to ze promenna po vytvoreni je nemenna coz je zde chteny stav
+        // CLEAN-CODE: task -> description je to vice popisne a muzes pak pouzit jmeno task pro pole
         System.out.println(ConsoleColors.GREEN_BOLD_BRIGHT + "Please enter the deadline(YYYY-MM-DD): " + ConsoleColors.RESET);
-        String deadline = scanner.nextLine();
+        String deadline = scanner.nextLine(); //CLEAN-CODE: promenne v metode defaultne nastavujeme na final, znamena to ze promenna po vytvoreni je nemenna coz je zde chteny stav
         Boolean done = null;
         while (done == null) {
             System.out.println(ConsoleColors.GREEN_BOLD_BRIGHT + "Please enter true if the task is done or enter false if it is yet to be done: " + ConsoleColors.RESET);
@@ -106,6 +112,18 @@ public class TaskManager {
         tasks[tasks.length - 1][0] = task;
         tasks[tasks.length - 1][1] = deadline;
         tasks[tasks.length - 1][2] = String.valueOf(done);
+
+
+        /*
+        //CLEAN-CODE:
+        final var task = new String[3];
+        task[0] = task;
+        task[1] = deadline;
+        task[2] = String.valueOf(done);
+
+        tasks[tasks.length - 1] = task;
+        */
+
 
         System.out.println(ConsoleColors.GREEN + "Task added successfully!" + ConsoleColors.RESET);
 
@@ -149,6 +167,8 @@ public class TaskManager {
     }
 
     public static void exitTasks(String[][] tasks, Scanner scanner) {
+
+        //CLEAN-CODE: kod zapisujici seznam ukolu do souboru predat do metody saveTasksToFile()
         final var path = Paths.get("src/main/resources/tasks.csv");
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile()))) {
