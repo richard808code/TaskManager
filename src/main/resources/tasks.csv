@@ -1,3 +1,8 @@
-test task cleanup important,     2024-12-22,     true
-test task 2.0 important,     2024-12-23,     true
-testing 2.1 important,    2024-12-23,    true
+test task cleanup important,        2024-12-22,        true
+test task 2.0 important,        2024-12-23,        true
+testing 2.1 important,       2024-12-23,       true
+important date parsing testing,   2024-12-23,   true
+important date test 2,   2021-22-32,   false
+testingdate3,  2023-03-03,  true
+testing date 4 impo,  2023-03-30,  true
+testing date 5, 2024-03-02, true
