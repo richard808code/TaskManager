@@ -12,7 +12,7 @@ public class TaskManager {
 
     private static String[][] tasks;
     private static Scanner scanner;
-    static final String[] OPTIONS = {"add", "remove", "list", "exit"};
+    private static final String[] OPTIONS = {"add", "remove", "list", "exit"};
 
     public static void main(String[] args) {
         scanner = new Scanner(System.in);
@@ -21,10 +21,10 @@ public class TaskManager {
         while (true) {
             displayUserOptions();
             switch (scanner.nextLine().toLowerCase()) {
-                case "add" -> tasks = addTask();
-                case "remove" -> tasks = removeTask();
+                case "add" -> addTask();
+                case "remove" -> removeTask();
                 case "list" -> listTasks();
-                case "exit" -> exitTasks();
+                case "exit" -> exit();
                 default -> System.err.println("Please select a correct option!");
             }
         }
@@ -50,7 +50,7 @@ public class TaskManager {
         } catch (IOException e) {
             System.err.println("Failed to load tasks.csv");
             e.printStackTrace(System.err);
-            System.exit(-1);
+            System.exit(1);
         }
         return tasks;
     }
@@ -60,29 +60,30 @@ public class TaskManager {
         final String description = scanner.nextLine();
 
         String deadline;
-            while (true) {
-                System.out.println(ConsoleColors.GREEN_BOLD_BRIGHT + "Please enter the deadline(YYYY-MM-DD): " + ConsoleColors.RESET);
-                deadline = scanner.nextLine();
-                if (deadline.matches("^\\d{4}-\\d{2}-\\d{2}$")) {
-                    final String[] splitDate = deadline.split("-");
-                        final var month = Integer.parseInt(splitDate[1]);
-                        final var day = Integer.parseInt(splitDate[2]);
-                        if ((month >= 1 && month <= 12) && (day >= 1 && day <= 31)) {
-                            break;
-                        } else {
-                            System.err.println("Please enter a valid month(1-12) or a valid day(1-31)");
-                        }
+        while (true) {
+            System.out.println(ConsoleColors.GREEN_BOLD_BRIGHT + "Please enter the deadline(YYYY-MM-DD): " + ConsoleColors.RESET);
+            deadline = scanner.nextLine();
+            if (deadline.matches("^\\d{4}-\\d{2}-\\d{2}$")) {
+                final String[] splitDate = deadline.split("-");
+                final var month = Integer.parseInt(splitDate[1]);
+                final var day = Integer.parseInt(splitDate[2]);
+                if ((month >= 1 && month <= 12) && (day >= 1 && day <= 31)) {
+                    break;
                 } else {
-                    System.err.println("Invalid format! Please use YYYY-MM-DD format!");
+                    System.err.println("Please enter a valid month(1-12) or a valid day(1-31)");
                 }
+            } else {
+                System.err.println("Invalid format! Please use YYYY-MM-DD format!");
             }
+        }
 
         Boolean done = null;
-        while (done == null) {
+        while (true) {
             System.out.println(ConsoleColors.GREEN_BOLD_BRIGHT + "Please enter true if the task is done or enter false if it is yet to be done: " + ConsoleColors.RESET);
             if (scanner.hasNextBoolean()) {
                 done = scanner.nextBoolean();
                 scanner.nextLine();
+                break;
             } else {
                 System.err.println("Invalid input. Please enter true or false.");
                 scanner.next();
@@ -156,7 +157,7 @@ public class TaskManager {
         }
     }
 
-    public static void exitTasks() {
+    public static void exit() {
         saveTasksToFile();
         System.out.println(ConsoleColors.RED + "The program finished!" + ConsoleColors.RESET);
         scanner.close();
